@@ -1,6 +1,7 @@
 # cors-mock
 
-> My gnarly Nuxt.js project
+oauthのAPIを叩くだけのnuxtモジュール
+エンドポイントやCORSの確認用
 
 ## Build Setup
 
