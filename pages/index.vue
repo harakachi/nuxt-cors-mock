@@ -4,8 +4,10 @@
     password: <input type="text" v-model="password">
     <button @click="getToken()">getToken</button>
     <br>
+    refresh token: {{refreshToken}}
     <br>
     <button @click="getUser()">getUser</button>
+    <button @click="getRefreshToken()">refresh!</button>
   </div>
 </template>
 
@@ -16,7 +18,8 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      refreshToken: ''
     }
   },
   methods: {
@@ -31,7 +34,25 @@ export default {
       }).catch((error) => {
         console.log(error)
       })
+      if (res) {
+        this.refreshToken = res.data.refresh_token
+      }
+    },
+
+    async getRefreshToken() {
+      const client = axios.create({ withCredentials: true })
+      const res = await client.post('http://localhost:3000/api/oauth/token.json', {
+        grant_type: 'refresh_token',
+        client_id: 'ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4',
+        client_secret: 'kYs0wzSxEZTjTQe3UtdXq-yp3IAJS-T29cwQhF5lrWI',
+        refresh_token: this.refreshToken
+      }).catch((error) => {
+        console.log(error)
+      })
       console.log(res)
+      if (res) {
+        this.refreshToken = res.data.refresh_token
+      }
     },
 
     async getUser() {
