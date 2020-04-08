@@ -22,13 +22,21 @@ export default {
       refreshToken: ''
     }
   },
+  computed: {
+    clientId() {
+      return 'ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4'
+    },
+    secret() {
+      return 'kYs0wzSxEZTjTQe3UtdXq-yp3IAJS-T29cwQhF5lrWI'
+    }
+  },
   methods: {
     async getToken() {
       const client = axios.create({ withCredentials: true })
       const res = await client.post('http://localhost:3000/api/oauth/token.json', {
         grant_type: 'password',
-        client_id: 'ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4',
-        client_secret: 'kYs0wzSxEZTjTQe3UtdXq-yp3IAJS-T29cwQhF5lrWI',
+        client_id: this.clientId,
+        client_secret: this.secret,
         username: this.email,
         password: this.password
       }).catch((error) => {
@@ -43,8 +51,8 @@ export default {
       const client = axios.create({ withCredentials: true })
       const res = await client.post('http://localhost:3000/api/oauth/token.json', {
         grant_type: 'refresh_token',
-        client_id: 'ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4',
-        client_secret: 'kYs0wzSxEZTjTQe3UtdXq-yp3IAJS-T29cwQhF5lrWI',
+        client_id: this.clientId,
+        client_secret: this.secret,
         refresh_token: this.refreshToken
       }).catch((error) => {
         console.log(error)
