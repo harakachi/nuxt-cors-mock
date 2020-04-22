@@ -8,32 +8,52 @@
     <br>
     <button @click="getUser()">getUser</button>
     <button @click="getRefreshToken()">refresh!</button>
+
+    <div>
+      <h1>Please give us your payment details:</h1>
+      <card class='stripe-card'
+            :class='{ complete }'
+            stripe='pk_test_udubtHkBrm0cl996ejNYArfA00lngpPTJ8'
+            :options='stripeOptions'
+            @change='complete = $event.complete'
+      />
+      <button class='pay-with-stripe' @click='pay' :disabled='!complete'>Pay with credit card</button>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { Card, createToken } from 'vue-stripe-elements-plus'
+
 export default {
   // curl -X POST -d "grant_type=password&client_id=ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4&client_secret=" --verbose http://localhost:3000/api/oauth/token.json
+
+  components: { Card },
+
   data() {
     return {
       email: '',
       password: '',
-      refreshToken: ''
+      refreshToken: '',
+      complete: false,
+      client: axios.create({ withCredentials: true }),
+      stripeOptions: {
+        // see https://stripe.com/docs/stripe.js#element-options for details
+      },
     }
   },
   computed: {
     clientId() {
-      return 'ez6JFeiOjG71dXNLkDdqEvN7ymAoD-KY-yHtf8gOhB4'
+      return 'ouF5dkccsUwrFqLHJ-2JqTOZ_SH2mFBste0mVsu6ePA'
     },
     secret() {
-      return 'kYs0wzSxEZTjTQe3UtdXq-yp3IAJS-T29cwQhF5lrWI'
+      return 'pjjZFD9e-vQZ3qulQONytVSW13H60U3Ov31Cp0CA4hY'
     }
   },
   methods: {
     async getToken() {
-      const client = axios.create({ withCredentials: true })
-      const res = await client.post('http://localhost:3000/api/oauth/token.json', {
+      const res = await this.client.post('http://localhost:3000/api/oauth/token.json', {
         grant_type: 'password',
         client_id: this.clientId,
         client_secret: this.secret,
@@ -48,8 +68,7 @@ export default {
     },
 
     async getRefreshToken() {
-      const client = axios.create({ withCredentials: true })
-      const res = await client.post('http://localhost:3000/api/oauth/token.json', {
+      const res = await this.client.post('http://localhost:3000/api/oauth/token.json', {
         grant_type: 'refresh_token',
         client_id: this.clientId,
         client_secret: this.secret,
@@ -64,15 +83,33 @@ export default {
     },
 
     async getUser() {
-      const client = axios.create({ withCredentials: true })
-      const res = await client.get('http://localhost:3000/api/users/me.json').catch((error) => (
+
+      const res = await this.client.get('http://localhost:3000/api/users/me.json').catch((error) => (
         console.log(error)
       ))
       console.log(res)
     },
+
+    async pay() {
+      const token = await createToken().catch(() => null)
+      console.log(token.token.id)
+      const res = await this.client.post('http://localhost:3000/api/accounts/credit', {
+        token: token.token.id
+      }).catch((e) => {
+        console.log(e)
+      })
+      console.log(res)
+    }
   }
 }
 </script>
 
 <style>
+  .stripe-card {
+    width: 300px;
+    border: 1px solid grey;
+  }
+  .stripe-card.complete {
+    border-color: green;
+  }
 </style>
