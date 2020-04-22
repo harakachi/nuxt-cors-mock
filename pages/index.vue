@@ -17,7 +17,8 @@
             :options='stripeOptions'
             @change='complete = $event.complete'
       />
-      <button class='pay-with-stripe' @click='pay' :disabled='!complete'>Pay with credit card</button>
+      <button class='pay-with-stripe' @click='pay' :disabled='!complete'>Pay with credit card</button><br>
+      <button @click='cancel'>cancel subscription</button><br>
     </div>
   </div>
 </template>
@@ -96,6 +97,13 @@ export default {
       const res = await this.client.post('http://localhost:3000/api/accounts/credit', {
         token: token.token.id
       }).catch((e) => {
+        console.log(e)
+      })
+      console.log(res)
+    },
+
+    async cancel() {
+      const res = await this.client.delete('http://localhost:3000/api/accounts/credit').catch((e) => {
         console.log(e)
       })
       console.log(res)
